@@ -13,10 +13,10 @@ npm install mongoose-gm
 This module is an extension to mongoose-gridstore. This release offers automatic resizing of images, and adds it as attachment to the schema.
 
 ### mongoose-gridstore
-All functionality of mongoose-gridstore is inherited. Full API of mongoose-gridstore is added to your schema. See the mongoose gridstore README.md for the API.
+All functionality of mongoose-gridstore is inherited. Full API of mongoose-gridstore is added to your schema. See the mongoose-gridstore README.
 
 ### imagemagick
-This module depends on imagemagick, which in turn depends on the imagemagick CLI installed. Without it, it does not work. See the README.md of imagemagick for details.
+This module depends on imagemagick, which in turn depends on the imagemagick CLI installed. Without it, it does not work. See the imagemagick README.
 
 ## Example
 
@@ -34,7 +34,7 @@ var kittenSchema = new mongoose.Schema({
 var options = {
     resize: {
         //any imagemagick option can be filled in.
-        //srcPath, dstPath is *not* required since we are manipulating db images.
+        //srcPath, dstPath is not required since we are manipulating db images.
         thumbnail: { 
             quality: 0.8,
             format: 'jpg',
@@ -84,8 +84,7 @@ kitten.addAttachment('license.pdf', licenseBuffer)
 
 Kitten.find({}, function(err,docs) {
     //since mongoose middle ware does not allow post manipulation you need to load your
-    //attachments explicitly after a save or query!
-    
+    //attachments explicitly after a save or query.   
     docs.forEach(function(doc) {
         doc.loadAttachments().done();
     });    
@@ -198,8 +197,6 @@ kitten.addImage('kitten.jpg', data)
 Update an attachment with name with the new buffer. The image and resized images as specified in the options of the plugin are stored in gridstore.
 
 ```javascript
-var kitten = new Kitten();
-
 kitten.updateImage('kitten.jpg', data)
     .then(function(doc) {
         doc.attachments.forEach(function(attachment) {
@@ -216,8 +213,6 @@ kitten.updateImage('kitten.jpg', data)
 Remove the image from the attachments and gridstore.
 
 ```javascript
-var kitten = new Kitten();
-
 kitten.removeImage('kitten.jpg')
     .then(function(doc) {
         doc.attachments.forEach(function(attachment) {

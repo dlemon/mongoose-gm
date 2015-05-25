@@ -18,6 +18,7 @@
     ],
     "main": "index.js",
     "dependencies": {
+        "mongoose":"latest",
         "mongoose-gridstore":"latest",
         "rwlock":"latest",
         "modelo":"latest",
