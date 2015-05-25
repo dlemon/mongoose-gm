@@ -22,7 +22,8 @@
         "mongoose-gridstore":"latest",
         "rwlock":"latest",
         "modelo":"latest",
-        "imagemagick":"latest"
+        "imagemagick":"latest",
+        "q":"latest"
     },
     "devDependencies": {
         "mocha": "latest",
