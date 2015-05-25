@@ -1,6 +1,10 @@
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install imagemagick graphicsmagick
 language: node_js
 services: mongodb
 node_js:
   - '0.10'
+  - '0.12'
 script:
   - npm test

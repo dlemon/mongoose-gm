@@ -1,4 +1,4 @@
-![alt tag](https://travis-ci.org/dlemon/mongoose-gm.svg?branch=master) [![NPM version][npm-version-image]][npm-url]  [![MIT License][license-image]][license-url] [![NPM downloads][npm-downloads-image]][npm-url]
+![alt tag](https://travis-ci.org/dlemon/mongoose-gm.svg?branch=master) [![NPM version][npm-version-image]][npm-url] [![MIT License][license-image]][license-url] [![NPM downloads][npm-downloads-image]][npm-url]
 
 # mongoose-gm
 Promise based mongoose plugin for storing/manipulating images in gridstore.
@@ -10,13 +10,13 @@ npm install mongoose-gm
 ```
 
 ## Usage
-This module is an extension to mongoose-gridstore. This release offers automatic resizing of images, and adds it as attachment to the schema.
+This module is an extension to mongoose-gridstore. This release offers automatic resizing of images, and adds the resized buffers to the attachment.
 
 ### mongoose-gridstore
 All functionality of mongoose-gridstore is inherited. Full API of mongoose-gridstore is added to your schema. See the mongoose-gridstore README.
 
-### imagemagick
-This module depends on imagemagick, which in turn depends on the imagemagick CLI installed. Without it, it does not work. See the imagemagick README.
+### gm
+This module depends on gm, which in turn depends on the imagemagick CLI installed. Without it, it does not work. See the gm README.
 
 ## Example
 
@@ -33,60 +33,51 @@ var kittenSchema = new mongoose.Schema({
 
 var options = {
     resize: {
-        //any imagemagick option can be filled in.
-        //srcPath, dstPath is not required since we are manipulating db images.
         thumbnail: { 
-            quality: 0.8,
-            format: 'jpg',
-            progressive: false,
             width: 256,
-            height: 256,
-            strip: true,
-            filter: 'Lagrange',
-            sharpening: 0.2
+            height: 256
         },            
         full: {
-            quality: 1.0,
-            format: 'jpg',
-            progressive: false,
-            width: 1600,
-            strip: true,
-            filter: 'Lagrange',
+            width: 1600 //maintain aspect ratio
         }
     },
     
     keys: ['isKittenLicense']
-}
+};
 
 kittenSchema.plugin(gm, options);
 var Kitten = mongoose.model('Kitten', kittenSchema);
 var kitten = new Kitten();
 
 kitten.addAttachment('license.pdf', licenseBuffer)
-    .then(kitten.addImage('kitten.jpg', imageBuffer))
-    .then(function(doc) {       
-        doc.attachments.forEach(function(attachment) {            
-            if (attachment.name == 'license.pdf') {
-                attachment.isKittenLicense = true;  //example of extra keys supplied in options.
-            }
-            console.log(attachment);
-        });       
+.then(kitten.addImage('kitten.jpg', imageBuffer).bind(kitten))
+.then(function(doc) {       
+    doc.attachments.forEach(function(attachment) {            
+        if (attachment.name == 'license.pdf') {
+            attachment.isKittenLicense = true;  //example of extra keys supplied in options.
+        }
+        console.log(attachment);
+    });       
 
-        return true;
-    })
-    .then(kitten.save)
-    .then(kitten.loadAttachments) //must be called after a save or query (see below)
-    .catch(function(err) {
-        throw err;
-    })
-    .done();
+    return true;
+})
+.then(kitten.save.bind(kitten))
+.then(kitten.load.bind(kitten)) //must be called after a save or query (see below)
+.catch(function(err) {
+    throw err;
+})
+.done();
 
 
 Kitten.find({}, function(err,docs) {
     //since mongoose middle ware does not allow post manipulation you need to load your
     //attachments explicitly after a save or query.   
     docs.forEach(function(doc) {
-        doc.loadAttachments().done();
+        doc.load()
+        .catch(function(err) {
+            throw err;
+        })
+        .done();
     });    
 });
 ```
@@ -117,31 +108,40 @@ var kittenSchema = new mongoose.Schema({
 
 var options = {
     resize: {
-        //any imagemagick option can be filled in.
-        //srcPath, dstPath is *not* required since we are manipulating db images.
-        thumbnail: { 
-            quality: 0.8,
-            format: 'jpg',
-            progressive: false,
+        small: { 
             width: 256,
-            height: 256,
-            strip: true,
-            filter: 'Lagrange',
-            sharpening: 0.2
+            height: 256
         },            
-        full: {
-            quality: 1.0,
-            format: 'jpg',
-            progressive: false,
-            width: 1600,
-            strip: true,
-            filter: 'Lagrange',
+        medium: {
+            width: 1600 //resize with aspect ratio of original image
         }
     }
 };
 
 kittenSchema.plugin(gm, options);
 ```
+
+### resized images
+Resized images are automatically stored in your attachment with the specified keys in resize options:
+
+```javascript
+fs.readFile('kitten.jpg', function (err, data) {
+    if (err) throw err;
+    var kitten = new Kitten();
+    kitten.addImage('kitten.jpg', data)
+    .then(function(doc) {
+        doc.attachments.forEach(function(attachment) {
+            if (attachment.filename == 'kitten.jpg') {
+                console.log(attachment.small);  //buffer containing small resized image
+                console.log(attachment.medium); //buffer containing medium resized image
+            }
+        });
+    });  
+    .catch(function(err) {
+        throw err;
+    })
+    .done();
+});
 
 ### Image meta data
 Image meta data is automatically stored as property in the attachment:
@@ -151,14 +151,17 @@ fs.readFile('kitten.jpg', function (err, data) {
     if (err) throw err;
     var kitten = new Kitten();
     kitten.addImage('kitten.jpg', data)
-        .then(function(doc) {
-            doc.attachments.forEach(function(attachment) {
-                if (attachment.filename == 'kitten.jpg') {
-                    console.log(attachment.metadata);
-                }
-            });
-        });  
-    });
+    .then(function(doc) {
+        doc.attachments.forEach(function(attachment) {
+            if (attachment.filename == 'kitten.jpg') {
+                console.log(attachment.metadata);
+            }
+        });
+    })
+    .catch(function(err) {
+        throw err;
+    })
+    .done();
 });
 ```
 
@@ -172,25 +175,23 @@ Add an attachment with name and buffer. The image and resized images as specifie
 var kitten = new Kitten();
 
 kitten.addImage('kitten.jpg', data)
-    .then(function(doc) {
-        return kitten.save();        
-    })
-    .then(kitten.loadAttachments)   //mongoose-gridstore inherited function.
-    .then(function(doc) {
-        doc.attachments.forEach(function(attachment) {
-            if (attachment.filename == 'kitten.jpg') {
-                console.log('metadata', attachment.metadata);
-                console.log('image buffer', attachment.buffer);
-                console.log('image mimetype', attachment.mimetype);
-                console.log('image name', attachment.filename);
-                console.log('Thumbnail buffer, if specified in options', attachment.resize.thumbnail);
-            }
-        });
-    })
-    .catch(function(err) {
-        throw err;
-    })
-    .done();
+.then(kitten.save.bind(kitten))
+.then(kitten.loadAttachments)   //mongoose-gridstore inherited function.
+.then(function(doc) {
+    doc.attachments.forEach(function(attachment) {
+        if (attachment.filename == 'kitten.jpg') {
+            console.log('metadata', attachment.metadata);
+            console.log('image buffer', attachment.buffer);
+            console.log('image mimetype', attachment.mimetype);
+            console.log('image name', attachment.filename);
+            console.log('Thumbnail buffer, if specified in options.resize', attachment.resize.thumbnail);
+        }
+    });
+})
+.catch(function(err) {
+    throw err;
+})
+.done();
 ```
 
 ### updateImage(name,buffer)
@@ -198,15 +199,15 @@ Update an attachment with name with the new buffer. The image and resized images
 
 ```javascript
 kitten.updateImage('kitten.jpg', data)
-    .then(function(doc) {
-        doc.attachments.forEach(function(attachment) {
-            console.log(attachment);
-        });
-    })
-    .catch(function(err) {
-        throw err;
-    })
-    .done();
+.then(function(doc) {
+    doc.attachments.forEach(function(attachment) {
+        console.log(attachment);
+    });
+})
+.catch(function(err) {
+    throw err;
+})
+.done();
 ```
 
 ### removeImage(name)
@@ -214,15 +215,31 @@ Remove the image from the attachments and gridstore.
 
 ```javascript
 kitten.removeImage('kitten.jpg')
-    .then(function(doc) {
-        doc.attachments.forEach(function(attachment) {
-            console.log(attachment);
-        });
-    })
-    .catch(function(err) {
-        throw err;
-    })
-    .done();
+.then(function(doc) {
+    doc.attachments.forEach(function(attachment) {
+        console.log(attachment);
+    });
+})
+.catch(function(err) {
+    throw err;
+})
+.done();
+```
+
+### load()
+Load all attachments including images from the gridstore
+
+```javascript
+kitten.load()
+.then(function(doc) {
+    doc.attachments.forEach(function(attachment) {
+        console.log(attachment);
+    });
+})
+.catch(function(err) {
+    throw err;
+})
+.done();
 ```
 
 ## Test
