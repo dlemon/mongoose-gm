@@ -1,4 +1,4 @@
-![alt tag](https://travis-ci.org/dlemon/mongoose-gm.svg?branch=master) [![NPM version][npm-version-image]][npm-url] [![MIT License][license-image]][license-url] [![NPM downloads][npm-downloads-image]][npm-url]
+![alt tag](https://travis-ci.org/dlemon/mongoose-gridstore.svg?branch=master) [![NPM version][npm-version-image]][npm-url]  [![MIT License][license-image]][license-url] [![NPM downloads][npm-downloads-image]][npm-url]
 
 # mongoose-gm
 Promise based mongoose plugin for storing/manipulating images in gridstore.
@@ -242,8 +242,9 @@ kitten.load()
 .done();
 ```
 
-## Test
-Above scenarios have been tested and can be found in the test directory of the node module. You can verify the package by executing mocha test in the root of the module.
+### Test
+Above scenarios have been tested and can be found in the test directory of the node module. 
+You can verify the package by executing mocha test in the root of the module.
 
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg?style=flat
 [license-url]: license.txt
