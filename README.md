@@ -251,3 +251,10 @@ Kitten.find({}, function(err,docs) {
 
 ## Test
 This module contains mocha tests in the test directory that includes a test of the example.
+
+[license-image]: https://img.shields.io/badge/license-MIT-blue.svg?style=flat
+[license-url]: license.txt
+
+[npm-url]: https://npmjs.org/package/mongoose-gm
+[npm-version-image]: https://img.shields.io/npm/v/mongoose-gm.svg?style=flat
+[npm-downloads-image]: https://img.shields.io/npm/dm/mongoose-gm.svg?style=flat
