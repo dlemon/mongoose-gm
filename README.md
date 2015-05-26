@@ -167,7 +167,7 @@ var kitten = new Kitten();
 
 kitten.addImage('kitten.jpg', data)
 .then(kitten.save.bind(kitten))
-.then(kitten.loadAttachments)   //mongoose-gridstore inherited function.
+.then(kitten.load.bind(kitten)) //load all images and attachments
 .then(function(doc) {
     doc.attachments.forEach(function(attachment) {
         if (attachment.filename == 'kitten.jpg') {
