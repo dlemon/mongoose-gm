@@ -33,11 +33,11 @@ var kittenSchema = new mongoose.Schema({
 
 var options = {
     resize: {
-        thumbnail: { 
+        small: { 
             width: 256,
             height: 256
         },            
-        full: {
+        medium: {
             width: 1600 //maintain aspect ratio
         }
     },
@@ -51,18 +51,8 @@ var kitten = new Kitten();
 
 kitten.addAttachment('license.pdf', licenseBuffer)
 .then(kitten.addImage('kitten.jpg', imageBuffer).bind(kitten))
-.then(function(doc) {       
-    doc.attachments.forEach(function(attachment) {            
-        if (attachment.name == 'license.pdf') {
-            attachment.isKittenLicense = true;  //example of extra keys supplied in options.
-        }
-        console.log(attachment);
-    });       
-
-    return true;
-})
 .then(kitten.save.bind(kitten))
-.then(kitten.load.bind(kitten)) //must be called after a save or query (see below)
+.then(kitten.load.bind(kitten)) //load all attachments and images, must be called after a save or query (see below)
 .catch(function(err) {
     throw err;
 })
@@ -185,7 +175,7 @@ kitten.addImage('kitten.jpg', data)
             console.log('image buffer', attachment.buffer);
             console.log('image mimetype', attachment.mimetype);
             console.log('image name', attachment.filename);
-            console.log('Thumbnail buffer, if specified in options.resize', attachment.resize.thumbnail);
+            console.log('Thumbnail buffer, if specified in options.resize', attachment.thumbnail);
         }
     });
 })
