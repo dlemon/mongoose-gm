@@ -142,6 +142,7 @@ fs.readFile('kitten.jpg', function (err, data) {
     })
     .done();
 });
+```
 
 ### Image meta data
 Image meta data is automatically stored as property in the attachment:
