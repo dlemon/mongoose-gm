@@ -76,6 +76,19 @@ describe('Schema decoration',function() {
        kitten.should.have.property('load'); 
        kitten.load.should.be.an('Function');
     });
+    it('should decorate with a partialLoad function', function() {
+       kitten.should.have.property('partialLoad'); 
+       kitten.partialLoad.should.be.an('Function');
+    });
+    it('should decorate with a loadSingleImage function', function() {
+       kitten.should.have.property('loadSingleImage'); 
+       kitten.loadSingleImage.should.be.an('Function');
+    });
+    it('should decorate with a partialLoadSingleImage function', function() {
+       kitten.should.have.property('partialLoadSingleImage'); 
+       kitten.partialLoadSingleImage.should.be.an('Function');
+    });
+    
     after(function(done) {
         mongoose.connection.close(function(err) {
             if(err) {
@@ -208,4 +221,227 @@ describe('Example', function() {
             done();
         });
     });        
+});
+
+
+describe('Partial load',function() {
+   var kitten;
+
+    before(function(done) {
+       mongoose.connect(URI, function(err){
+            if (err) {
+              return done(err);
+            }          
+            var Kitten = mongoose.model('Kitten', kittenSchema);
+            kitten = new Kitten();   
+            done();
+       });
+    });       
+       
+    it('should only load keys, metadata and filename', function(done){
+        fs.readFile('test/kitten.jpg',function(err,data) {
+            if(err) {return done(err);}
+            kitten.addImage('kitten.jpg', data)
+            .then(function(doc) {
+                doc.attachments[0].isKittenLicense = false;
+                return doc;
+            })
+            .then(function(doc) {
+                fs.readFile('test/another-kitten.jpg', function(err,data) {
+                    if(err) {return done(err);}                   
+                    doc.addImage('another-kitten.jpg', data)
+                    .then(function(doc) {
+                        doc.attachments[0].isKittenLicense = false;
+                        return doc;    
+                    })
+                    .then(function(doc) {
+                        return doc.save();
+                    })
+                    .then(function(doc) {
+                        return doc.partialLoad();
+                    })
+                    .then(function(doc) {
+                        if(doc.attachments.length != 2) {return done('attachments not loaded');}
+                        
+                        if(doc.attachments[0].filename != 'kitten.jpg') {return done('filename incorrect');}
+                        if(doc.attachments[0].small.length <= 0) {return done('small image not loaded');}
+                        if(doc.attachments[0].medium.length <= 0) {return done('medium image not loaded');}
+                        if(doc.attachments[0].buffer.length > 0) {return done('buffer size > 0');}
+                        if(!doc.attachments[0].hasOwnProperty('isKittenLicense')) {return done('property isKittenLicense not loaded');}
+
+                        if(doc.attachments[1].filename != 'another-kitten.jpg') {return done('filename incorrect');}
+                        if(doc.attachments[1].small.length <= 0) {return done('small image not loaded');}
+                        if(doc.attachments[1].medium.length <= 0) {return done('medium image not loaded');}
+                        if(doc.attachments[1].buffer.length > 0) {return done('buffer size > 0');}
+                        if(!doc.attachments[1].hasOwnProperty('isKittenLicense')) {return done('property isKittenLicense not loaded');}
+                        
+                        done();                
+                    })
+                    .catch(function(err) {
+                        done(err);
+                    })
+                    .done();                    
+                });
+            })
+            .catch(function(err) {
+                done(err);
+            })
+            .done();                    
+        });
+    });
+    
+    after(function(done) {
+        mongoose.connection.close(function(err) {
+            if(err) {
+                return done(err);
+            }
+            done();
+        });
+    });            
+});
+
+describe('Partial load single image',function() {
+   var kitten;
+
+    before(function(done) {
+       mongoose.connect(URI, function(err){
+            if (err) {
+              return done(err);
+            }          
+            var Kitten = mongoose.model('Kitten', kittenSchema);
+            kitten = new Kitten();   
+            done();
+       });
+    });       
+       
+    it('should only load keys, metadata and filename of a single image', function(done){
+        fs.readFile('test/kitten.jpg',function(err,data) {
+            if(err) {return done(err);}
+            kitten.addImage('kitten.jpg', data)
+            .then(function(doc) {
+                doc.attachments[0].isKittenLicense = false;
+                return doc;
+            })
+            .then(function(doc) {
+                fs.readFile('test/another-kitten.jpg', function(err,data) {
+                    if(err) {return done(err);}                   
+                    doc.addImage('another-kitten.jpg', data)
+                    .then(function(doc) {
+                        doc.attachments[0].isKittenLicense = false;
+                        return doc;    
+                    })
+                    .then(function(doc) {
+                        return doc.save();
+                    })
+                    .then(function(doc) {
+                        return doc.partialLoadSingleImage('another-kitten.jpg');
+                    })
+                    .then(function(doc) {
+                        if(doc.attachments.length != 2) {return done('attachments not loaded');}
+                        
+                        if(doc.attachments[0].filename != 'kitten.jpg') {return done('filename incorrect');}
+                        if(doc.attachments[0].hasOwnProperty('isKittenLicense')) {return done('property isKittenLicense loaded');}
+
+                        if(doc.attachments[1].filename != 'another-kitten.jpg') {return done('filename incorrect');}
+                        if(doc.attachments[1].small.length <= 0) {return done('small image not loaded');}
+                        if(doc.attachments[1].medium.length <= 0) {return done('medium image not loaded');}
+                        if(doc.attachments[1].buffer.length > 0) {return done('buffer size > 0');}
+                        if(!doc.attachments[1].hasOwnProperty('isKittenLicense')) {return done('property isKittenLicense not loaded');}
+                        
+                        done();                
+                    })
+                    .catch(function(err) {
+                        done(err);
+                    })
+                    .done();                    
+                });
+            })
+            .catch(function(err) {
+                done(err);
+            })
+            .done();                    
+        });
+    });
+    
+    after(function(done) {
+        mongoose.connection.close(function(err) {
+            if(err) {
+                return done(err);
+            }
+            done();
+        });
+    });            
+});
+
+describe('load single image',function() {
+   var kitten;
+
+    before(function(done) {
+       mongoose.connect(URI, function(err){
+            if (err) {
+              return done(err);
+            }          
+            var Kitten = mongoose.model('Kitten', kittenSchema);
+            kitten = new Kitten();   
+            done();
+       });
+    });       
+       
+    it('should fully load a single image', function(done){
+        fs.readFile('test/kitten.jpg',function(err,data) {
+            if(err) {return done(err);}
+            kitten.addImage('kitten.jpg', data)
+            .then(function(doc) {
+                doc.attachments[0].isKittenLicense = false;
+                return doc;
+            })
+            .then(function(doc) {
+                fs.readFile('test/another-kitten.jpg', function(err,data) {
+                    if(err) {return done(err);}                   
+                    doc.addImage('another-kitten.jpg', data)
+                    .then(function(doc) {
+                        doc.attachments[0].isKittenLicense = false;
+                        return doc;    
+                    })
+                    .then(function(doc) {
+                        return doc.save();
+                    })
+                    .then(function(doc) {
+                        return doc.loadSingleImage('another-kitten.jpg');
+                    })
+                    .then(function(doc) {
+                        if(doc.attachments.length != 2) {return done('attachments not loaded');}
+                        
+                        if(doc.attachments[0].filename != 'kitten.jpg') {return done('filename incorrect');}
+                        if(doc.attachments[0].hasOwnProperty('isKittenLicense')) {return done('property isKittenLicense loaded');}
+
+                        if(doc.attachments[1].filename != 'another-kitten.jpg') {return done('filename incorrect');}
+                        if(doc.attachments[1].small.length <= 0) {return done('small image not loaded');}
+                        if(doc.attachments[1].medium.length <= 0) {return done('medium image not loaded');}
+                        if(doc.attachments[1].buffer.length <= 0) {return done('buffer size <= 0');}
+                        if(!doc.attachments[1].hasOwnProperty('isKittenLicense')) {return done('property isKittenLicense not loaded');}
+                        
+                        done();                
+                    })
+                    .catch(function(err) {
+                        done(err);
+                    })
+                    .done();                    
+                });
+            })
+            .catch(function(err) {
+                done(err);
+            })
+            .done();                    
+        });
+    });
+    
+    after(function(done) {
+        mongoose.connection.close(function(err) {
+            if(err) {
+                return done(err);
+            }
+            done();
+        });
+    });            
 });
