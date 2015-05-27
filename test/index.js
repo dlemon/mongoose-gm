@@ -101,7 +101,7 @@ describe('Schema decoration',function() {
 
 describe('Example', function() {
     var kitten;
-    
+
     before(function(done) {
        mongoose.connect(URI, function(err){
             if (err) {
@@ -239,6 +239,7 @@ describe('Partial load',function() {
     });       
        
     it('should only load keys, metadata and filename', function(done){
+        this.timeout(5000);
         fs.readFile('test/kitten.jpg',function(err,data) {
             if(err) {return done(err);}
             kitten.addImage('kitten.jpg', data)
@@ -315,6 +316,7 @@ describe('Partial load single image',function() {
     });       
        
     it('should only load keys, metadata and filename of a single image', function(done){
+        this.timeout(5000);
         fs.readFile('test/kitten.jpg',function(err,data) {
             if(err) {return done(err);}
             kitten.addImage('kitten.jpg', data)
@@ -388,6 +390,7 @@ describe('load single image',function() {
     });       
        
     it('should fully load a single image', function(done){
+        this.timeout(5000);
         fs.readFile('test/kitten.jpg',function(err,data) {
             if(err) {return done(err);}
             kitten.addImage('kitten.jpg', data)
