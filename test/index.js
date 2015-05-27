@@ -157,6 +157,7 @@ describe('mongoose-gm plugin', function() {
         });
 
         it('should add image kitten.jpg including metadata', function(done) {
+            this.timeout(3000);
             kitten.addImage('kitten.jpg', bufferKitten)
             .then(function(doc) {
                 if(doc.attachments.length != 2) return done('attachment not added');
@@ -174,7 +175,7 @@ describe('mongoose-gm plugin', function() {
             .done();
         });
         
-        it('should save and read back all attachments', function(done) {
+        it('should save and read back all attachments', function(done) {            
             kitten.save()
             .then(function(doc) {
                 doc.load()
@@ -193,6 +194,7 @@ describe('mongoose-gm plugin', function() {
         });
 
         it('should update image kitten.jpg including metadata', function(done) {
+            this.timeout(3000);
             var original_metadata = kitten.attachments[1].metadata;
                         
             kitten.updateImage('kitten.jpg', bufferAnotherKitten)
