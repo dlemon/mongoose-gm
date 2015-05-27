@@ -19,9 +19,7 @@ All functionality of mongoose-gridstore is inherited. Full API of mongoose-grids
 This module depends on gm, which in turn depends on the imagemagick CLI installed. Without it, it does not work. See the gm README.
 
 ## Granularity
-You have the ability to partially/fully load all attachments or do the same for a single attachment. Since this API inherits the mongoose-gridstore API
-your granularity is also add image attachment or attachment level: you can opt to only load images or only load attachments that are not images, or 
-mix and match loading of the two types.
+You have the ability to partially/fully load all images or do the same for a single image. 
 
 ## Schema Decoration
 ```javascript
