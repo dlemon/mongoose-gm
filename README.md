@@ -24,13 +24,13 @@ You have the ability to partially/fully load all images or do the same for a sin
 ## Schema Decoration
 ```javascript
 var mongoose  = require('mongoose');
-var gm = require('mongoose-gm');
+var mongooseGM = require('mongoose-gm');
 
 var kittenSchema = new mongoose.Schema({
     name: {type:String, default:''}
 });
 
-kittenSchema.plugin(gm);
+kittenSchema.plugin(mongooseGM);
 var Kitten = mongoose.model('Kitten', kittenSchema);
 ```
 
@@ -278,20 +278,20 @@ var options = {
     keys: ['isKittenLicense']
 };
 
-kittenSchema.plugin(gm, options);
+kittenSchema.plugin(mongooseGM, options);
+
 var Kitten = mongoose.model('Kitten', kittenSchema);
 var kitten = new Kitten();
 
-//add a pdf to the kitten object. Use the mongoose-gridstore API
+//add a pdf to the kitten object. 
+//Use the mongoose-gridstore API
+
 fs.readFile('test/license.pdf',function(err,data) {
     if(err) {throw err;}
-    kitten.addAttachment('license.pdf', licenseBuffer)
+    kitten.addAttachment('license.pdf', data)
     .then(function(doc) {
         doc.attachments[0].isKittenLicense = true;
         return doc.save();
-    })
-    .then(function(doc) {
-        console.log('attachment added and saved.');
     })
     .catch(function(err) {
         throw err;
@@ -299,15 +299,14 @@ fs.readFile('test/license.pdf',function(err,data) {
     .done();
 });
  
-//add a picture of the kitten to the kitten object. Use the mongoose-gm API
+//add a picture of the kitten to the kitten object. 
+//Use the mongoose-gm API
+
 fs.readFile('test/kitten.jpg',function(err,data) {
     if(err) {throw err;}
-    kitten.addImage('kitten.jpg', licenseBuffer)
+    kitten.addImage('kitten.jpg', data)
     .then(function(doc) {
         return doc.save();
-    })
-    .then(function(doc) {
-        console.log('attachment added and saved.');
     })
     .catch(function(err) {
         throw err;
