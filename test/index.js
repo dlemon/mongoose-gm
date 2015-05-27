@@ -251,6 +251,7 @@ describe('mongoose-gm plugin', function() {
         });       
            
         it('should only load keys, metadata and filename', function(done){
+            this.timeout(3000);
             kitten.addImage('kitten.jpg', bufferKitten)
             .then(function(doc) {
                 doc.attachments[0].isKittenLicense = false;
@@ -317,6 +318,7 @@ describe('mongoose-gm plugin', function() {
         });       
            
         it('should only load keys, metadata and filename of a single image', function(done){
+            this.timeout(3000);
             kitten.addImage('kitten.jpg', bufferKitten)
             .then(function(doc) {
                 doc.attachments[0].isKittenLicense = false;
@@ -380,6 +382,7 @@ describe('mongoose-gm plugin', function() {
         });       
            
         it('should fully load a single image', function(done){
+            this.timeout(3000);
             kitten.addImage('kitten.jpg', bufferKitten)
             .then(function(doc) {
                 doc.attachments[0].isKittenLicense = false;
