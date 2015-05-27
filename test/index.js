@@ -133,6 +133,7 @@ describe('mongoose-gm plugin', function() {
         });
 
         it('should add attachment license.pdf', function(done) {
+            this.timeout(3000);
             fs.readFile('test/license.pdf',function(err,data) {
                 if(err) return done(err);
                 kitten.addAttachment('license.pdf', data)
