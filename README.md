@@ -18,70 +18,19 @@ All functionality of mongoose-gridstore is inherited. Full API of mongoose-grids
 ### gm
 This module depends on gm, which in turn depends on the imagemagick CLI installed. Without it, it does not work. See the gm README.
 
-## Example
-
-This is a full example mixing in the mongoose-gridstore API. 
-Loading of document buffers is not shown in this example.
-
-```javascript
-var mongoose  = require('mongoose');
-var gm = require('mongoose-gm');
-
-var kittenSchema = new mongoose.Schema({
-    name: {type:String, default:''}
-});
-
-var options = {
-    resize: {
-        small: { 
-            width: 256,
-            height: 256
-        },            
-        medium: {
-            width: 1600 //maintain aspect ratio
-        }
-    },
-    
-    keys: ['isKittenLicense']
-};
-
-kittenSchema.plugin(gm, options);
-var Kitten = mongoose.model('Kitten', kittenSchema);
-var kitten = new Kitten();
-
-kitten.addAttachment('license.pdf', licenseBuffer)
-.then(kitten.addImage('kitten.jpg', imageBuffer).bind(kitten))
-.then(kitten.save.bind(kitten))
-.then(kitten.load.bind(kitten)) //load all attachments and images, must be called after a save or query (see below)
-.catch(function(err) {
-    throw err;
-})
-.done();
-
-
-Kitten.find({}, function(err,docs) {
-    //since mongoose middle ware does not allow post manipulation you need to load your
-    //attachments explicitly after a save or query.   
-    docs.forEach(function(doc) {
-        doc.load()
-        .catch(function(err) {
-            throw err;
-        })
-        .done();
-    });    
-});
-```
+## Granularity
+You have the ability to partially/fully load all images or do the same for a single image. 
 
 ## Schema Decoration
 ```javascript
 var mongoose  = require('mongoose');
-var gm = require('mongoose-gm');
+var mongooseGM = require('mongoose-gm');
 
 var kittenSchema = new mongoose.Schema({
     name: {type:String, default:''}
 });
 
-kittenSchema.plugin(gm);
+kittenSchema.plugin(mongooseGM);
 var Kitten = mongoose.model('Kitten', kittenSchema);
 ```
 
@@ -89,26 +38,28 @@ var Kitten = mongoose.model('Kitten', kittenSchema);
 Automatic resizing and storing of resized images is supported by the option resize:
 
 ```javascript
-var mongoose  = require('mongoose');
-var gm = require('mongoose-gm');
+var mongoose   = require('mongoose');
+var mongooseGM = require('mongoose-gm');
 
 var kittenSchema = new mongoose.Schema({
     name: {type:String, default:''}
 });
 
 var options = {
-    resize: {
-        small: { 
+    resize: { 
+        small: { //adds 'small' property to the attachment containing the buffer with resized 256x256 image
             width: 256,
             height: 256
         },            
-        medium: {
+        medium: { //adds 'medium' property to the attachment containing resized 1600 width image.
             width: 1600 //resize with aspect ratio of original image
         }
-    }
+    },
+    keys : ['property1', 'property2'], //optional, additonal keys that you want to add to the attachment object
+    mongoose: mongoose //optional, the mongoose instance your app is using. Defaults to latest version.
 };
 
-kittenSchema.plugin(gm, options);
+kittenSchema.plugin(mongooseGM, options);
 ```
 
 ### resized images
@@ -156,6 +107,10 @@ fs.readFile('kitten.jpg', function (err, data) {
 });
 ```
 
+### example
+A simple use case example is added at the end of the API description.
+
+
 ## API
 The module decorates your schema with the following functions:
 
@@ -166,23 +121,34 @@ Add an attachment with name and buffer. The image and resized images as specifie
 var kitten = new Kitten();
 
 kitten.addImage('kitten.jpg', data)
-.then(kitten.save.bind(kitten))
-.then(kitten.load.bind(kitten)) //load all images and attachments
 .then(function(doc) {
-    doc.attachments.forEach(function(attachment) {
-        if (attachment.filename == 'kitten.jpg') {
-            console.log('metadata', attachment.metadata);
-            console.log('image buffer', attachment.buffer);
-            console.log('image mimetype', attachment.mimetype);
-            console.log('image name', attachment.filename);
-            console.log('Thumbnail buffer, if specified in options.resize', attachment.thumbnail);
-        }
-    });
+    //kitten now contains the attachment. promise returns the doc for further promise chaining/
 })
 .catch(function(err) {
     throw err;
 })
 .done();
+```
+
+### Accessing attachments
+
+```javascript
+kitten.attachments.forEach(function(attachment) {
+    console.log(attachment);
+});
+```
+
+#### Attachment object
+
+```javascript
+var attachment = {
+    filename: '',           //as specified in your addAttachment call
+    buffer: new Buffer(0),  //buffer containing the image
+    mimetype:'',            //mimetype of the image
+    metadata:''             //meta data of the image
+};
+
+//based on options of the plugin, the attachment will contain additional keys you've supplied in the options.
 ```
 
 ### updateImage(name,buffer)
@@ -231,6 +197,142 @@ kitten.load()
     throw err;
 })
 .done();
+```
+
+### partialLoad()
+partially load all attachments from the gridstore
+
+```javascript
+kitten.partialLoad()
+.then(function(doc) {
+    doc.attachments.forEach(function(attachment) {
+        console.log(attachment); //attachment buffer is empty, contains only keys,filename,mimetype and metadata
+    });
+})
+.catch(function(err) {
+    throw err;
+})
+.done();
+```
+
+### loadSingleImage(name)
+fully loads a single image into the attachments array
+
+```javascript
+kitten.loadSingleImage('kitten.jpg')
+.then(function(doc) {
+    doc.attachments.forEach(function(attachment) {
+        if (attachment.filename == 'kitten.jpg') {
+            console.log(attachment); //fully loaded attachment
+        }
+    });
+})
+.catch(function(err) {
+    throw err;
+})
+.done();
+```
+
+### partialLoadSingleImage(name)
+partially loads a single Image into the attachments array
+
+```javascript
+kitten.partialLoadSingleImage('kitten.jpg')
+.then(function(doc) {
+    doc.attachments.forEach(function(attachment) {
+        if (attachment.filename == 'kitten.jpg') {
+            console.log(attachment); //partial loaded attachment, buffer.length == 0;
+        }
+    });
+})
+.catch(function(err) {
+    throw err;
+})
+.done();
+```
+
+## Example
+
+This is a full example mixing in the mongoose-gridstore API. 
+
+```javascript
+var mongoose   = require('mongoose');
+var mongooseGM = require('mongoose-gm');
+var fs         = require('fs');
+
+var kittenSchema = new mongoose.Schema({
+    name: {type:String, default:''}
+});
+
+var options = {
+    resize: {
+        small: { 
+            width: 256,
+            height: 256
+        },            
+        medium: {
+            width: 1600 //maintain aspect ratio
+        }
+    },
+    
+    keys: ['isKittenLicense']
+};
+
+kittenSchema.plugin(mongooseGM, options);
+
+var Kitten = mongoose.model('Kitten', kittenSchema);
+var kitten = new Kitten();
+
+//add a pdf to the kitten object. 
+//Use the mongoose-gridstore API
+
+fs.readFile('test/license.pdf',function(err,data) {
+    if(err) {throw err;}
+    kitten.addAttachment('license.pdf', data)
+    .then(function(doc) {
+        doc.attachments[0].isKittenLicense = true;
+        return doc.save();
+    })
+    .catch(function(err) {
+        throw err;
+    })
+    .done();
+});
+ 
+//add a picture of the kitten to the kitten object. 
+//Use the mongoose-gm API
+
+fs.readFile('test/kitten.jpg',function(err,data) {
+    if(err) {throw err;}
+    kitten.addImage('kitten.jpg', data)
+    .then(function(doc) {
+        return doc.save();
+    })
+    .catch(function(err) {
+        throw err;
+    })
+    .done();
+});
+ 
+Kitten.find({}, function(err,docs) {
+    //since mongoose middleware does not allow post manipulation you need to load your
+    //attachments explicitly after a save or query.   
+    docs.forEach(function(doc) {
+        doc.load()
+        .then(function(doc) {
+            doc.attachments.forEach(function(attachment) {
+                console.log(attachment.filename);
+                console.log(attachment.mimetype);
+                console.log(attachment.buffer.length);
+                if(attachment.metadata){ console.log(attachment.metadata); }
+            });            
+        })
+        .catch(function(err) {
+            throw err;
+        })
+        .done();
+    });    
+});
 ```
 
 ### Test
