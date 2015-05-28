@@ -17,7 +17,7 @@ describe('mongoose-gm plugin', function() {
             bufferKitten = new Buffer(data.length);
             data.copy(bufferKitten);
             
-            fs.readFile('test/another-kitten.jpg',function(err,data) {
+            fs.readFile('test/beast-404.png',function(err,data) {
                 if(err) {return done(err);}
                 bufferAnotherKitten = new Buffer(data.length);
                 data.copy(bufferAnotherKitten);
