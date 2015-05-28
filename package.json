@@ -1,6 +1,6 @@
 {
     "name": "mongoose-gm",
-    "version": "0.1.15",
+    "version": "0.1.16",
     "description": "Mongoose plugin for manipulating images in your document schema",
 	"author":"Dennis Lemon <dennis.lemon@sudselekt.com>",
 	"scripts": {
@@ -24,7 +24,8 @@
         "rwlock":"latest",
         "modelo":"latest",
         "gm":"latest",
-        "q":"latest"
+        "q":"latest",
+        "node-uuid":"latest"
     },
     "devDependencies": {
         "mocha": "latest",
