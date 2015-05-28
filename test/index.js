@@ -12,7 +12,7 @@ describe('mongoose-gm plugin', function() {
     var bufferAnotherKitten;
 
     before(function(done) {
-        fs.readFile('test/kitten.jpg',function(err,data) {
+        fs.readFile('test/kitten.jpg', function(err,data) {
             if(err) {return done(err);}
             bufferKitten = new Buffer(data.length);
             data.copy(bufferKitten);
@@ -145,7 +145,9 @@ describe('mongoose-gm plugin', function() {
                 .then(function(doc) {
                     if(doc.attachments.length != 1) return done('attachment not added');
                     if(doc.attachments[0].filename != 'license.pdf') return done('filename <> license.pdf');                
-                    if(doc.attachments[0].buffer.length != data.length) return done('content not saved');                
+                    var a = doc.attachments[0].buffer.toString('base64');
+                    var b = data.toString('base64');
+                    if(a != b) return done('content not saved');
                     if(!doc.attachments[0].isKittenLicense) return done('key isKittenLicense not saved');                
                     done();
                 })
@@ -162,7 +164,10 @@ describe('mongoose-gm plugin', function() {
             .then(function(doc) {
                 if(doc.attachments.length != 2) return done('attachment not added');
                 if(doc.attachments[1].filename != 'kitten.jpg') return done('filename <> kitten.jpg');                
-                if(doc.attachments[1].buffer.length != bufferKitten.length) return done('content not saved');                
+                if(doc.attachments[1].buffer.length != bufferKitten.length) return done('content not saved');  
+                var a = doc.attachments[1].buffer.toString('base64');
+                var b = bufferKitten.toString('base64');
+                if(a != b) return done('content not saved');
                 if(!doc.attachments[1].metadata) return done('metadata not found');                
                 if(doc.attachments[1].small.length <= 0) return done('small image not found');                
                 if(doc.attachments[1].medium.length <=0) return done('medium image not found');                
