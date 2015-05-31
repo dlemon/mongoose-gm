@@ -1,6 +1,6 @@
 {
     "name": "mongoose-gm",
-    "version": "0.1.16",
+    "version": "0.1.17",
     "description": "Mongoose plugin for manipulating images in your document schema",
 	"author":"Dennis Lemon <dennis.lemon@sudselekt.com>",
 	"scripts": {
@@ -20,7 +20,7 @@
     "main": "index.js",
     "dependencies": {
         "mongoose":"latest",
-        "mongoose-gridstore":"latest",
+        "mongoose-gridstore":"^0.1.20",
         "rwlock":"latest",
         "modelo":"latest",
         "gm":"latest",
