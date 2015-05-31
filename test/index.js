@@ -30,6 +30,7 @@ describe('mongoose-gm plugin', function() {
         var kitten;
         
         before(function(done) {
+            this.timeout(5000);
             mongoose.connect(URI, function(err){
                 if (err) {
                   return done(err);
