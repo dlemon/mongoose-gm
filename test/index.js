@@ -14,13 +14,11 @@ describe('mongoose-gm plugin', function() {
     before(function(done) {
         fs.readFile('test/kitten.jpg', function(err,data) {
             if(err) {return done(err);}
-            bufferKitten = new Buffer(data.length);
-            data.copy(bufferKitten);
+            bufferKitten = new Buffer(data);
             
             fs.readFile('test/beast-404.png',function(err,data) {
                 if(err) {return done(err);}
-                bufferAnotherKitten = new Buffer(data.length);
-                data.copy(bufferAnotherKitten);
+                bufferAnotherKitten = new Buffer(data);
                 done();
             });
         });
@@ -146,7 +144,7 @@ describe('mongoose-gm plugin', function() {
                 .then(function(doc) {
                     if(doc.attachments.length != 1) return done('attachment not added');
                     if(doc.attachments[0].filename != 'license.pdf') return done('filename <> license.pdf');                
-                    var a = doc.attachments[0].buffer.toString('base64');
+                    var a = doc.attachments[0].buffer;
                     var b = data.toString('base64');
                     if(a != b) return done('content not saved');
                     if(!doc.attachments[0].isKittenLicense) return done('key isKittenLicense not saved');                
@@ -165,14 +163,10 @@ describe('mongoose-gm plugin', function() {
             .then(function(doc) {
                 if(doc.attachments.length != 2) return done('attachment not added');
                 if(doc.attachments[1].filename != 'kitten.jpg') return done('filename <> kitten.jpg');                
-                if(doc.attachments[1].buffer.length != bufferKitten.length) return done('content not saved');  
-                var a = doc.attachments[1].buffer.toString('base64');
-                var b = bufferKitten.toString('base64');
-                if(a != b) return done('content not saved');
+                if(doc.attachments[1].buffer.length != bufferKitten.toString('base64').length) return done('content not saved');  
                 if(!doc.attachments[1].metadata) return done('metadata not found');                
                 if(doc.attachments[1].small.length <= 0) return done('small image not found');                
-                if(doc.attachments[1].medium.length <=0) return done('medium image not found');                
-                
+                if(doc.attachments[1].medium.length <=0) return done('medium image not found');                                
                 done();
             })
             .catch(function(err) {
@@ -206,8 +200,8 @@ describe('mongoose-gm plugin', function() {
             kitten.updateImage('kitten.jpg', bufferAnotherKitten)
             .then(function(doc) {
                 if(doc.attachments.length != 2) return done('attachment not added');
-                if(doc.attachments[1].filename != 'kitten.jpg') return done('filename <> kitten.jpg');                
-                if(doc.attachments[1].buffer.length != bufferAnotherKitten.length) return done('content not saved');                
+                if(doc.attachments[1].filename != 'kitten.jpg') return done('filename <> kitten.jpg');       
+                if(doc.attachments[1].buffer.length != bufferAnotherKitten.toString('base64').length) return done('content not saved');                
                 if(!doc.attachments[1].metadata) return done('metadata not found');                
                 if(doc.attachments[1].small.length <= 0) return done('small image not found');                
                 if(doc.attachments[1].medium.length <=0) return done('medium image not found');                
