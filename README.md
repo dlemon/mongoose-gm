@@ -1,7 +1,7 @@
 ![alt tag](https://travis-ci.org/dlemon/mongoose-gridstore.svg?branch=master) [![NPM version][npm-version-image]][npm-url]  [![MIT License][license-image]][license-url] [![NPM downloads][npm-downloads-image]][npm-url]
 
 # mongoose-gm
-Promise based mongoose plugin for storing/manipulating images in gridstore.
+Promise based mongoose plugin for storing/manipulating base64 images in gridstore.
 
 ## Installation
 
@@ -143,7 +143,7 @@ kitten.attachments.forEach(function(attachment) {
 ```javascript
 var attachment = {
     filename: '',           //as specified in your addAttachment call
-    buffer: new Buffer(0),  //buffer containing the image
+    buffer: new Buffer(''), //base64 encoded buffer containing the image
     mimetype:'',            //mimetype of the image
     metadata:''             //meta data of the image
 };
