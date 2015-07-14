@@ -135,7 +135,7 @@ describe('mongoose-gm plugin', function() {
             this.timeout(5000);
             fs.readFile('test/license.pdf',function(err,data) {
                 if(err) return done(err);
-                kitten.addAttachment('license.pdf', data)
+                kitten.addImage('license.pdf', data)
                 .then(function(doc) {
                     doc.attachments[0].isKittenLicense = true;
                     return doc.save();
