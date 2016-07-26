@@ -39,13 +39,18 @@ describe('mongoose-gm plugin', function() {
                 });
                 
                 var options = {
-                    resize: {           
-                        small: { 
+                    resize: {
+                        small: {
                             width: 256,
                             height: 256,
-                        },            
+                        },
                         medium: {
                             width: 1600
+                        },
+                        thumbnail: {
+                            width: 256,
+                            height: 256,
+                            thumbnail: true
                         }
                     },
                     keys: ['isKittenLicense']
@@ -162,11 +167,13 @@ describe('mongoose-gm plugin', function() {
             kitten.addImage('kitten.jpg', bufferKitten)
             .then(function(doc) {
                 if(doc.attachments.length != 2) return done('attachment not added');
-                if(doc.attachments[1].filename != 'kitten.jpg') return done('filename <> kitten.jpg');                
-                if(doc.attachments[1].buffer.length != bufferKitten.toString('base64').length) return done('content not saved');  
-                if(!doc.attachments[1].metadata) return done('metadata not found');                
-                if(doc.attachments[1].small.length <= 0) return done('small image not found');                
-                if(doc.attachments[1].medium.length <=0) return done('medium image not found');                                
+                if(doc.attachments[1].filename != 'kitten.jpg') return done('filename <> kitten.jpg');
+                if(doc.attachments[1].buffer.length != bufferKitten.toString('base64').length) return done('content not saved');
+                if(!doc.attachments[1].metadata) return done('metadata not found');
+                if(doc.attachments[1].small.length <= 0) return done('small image not found');
+                if(doc.attachments[1].medium.length <=0) return done('medium image not found');
+                if(doc.attachments[1].thumbnail.length <=0) return done('thumbnail image not found');
+                console.log(doc.attachments[1].thumbnail);
                 done();
             })
             .catch(function(err) {
@@ -181,10 +188,11 @@ describe('mongoose-gm plugin', function() {
                 doc.load()
                 .then(function(doc) {
                     if(doc.attachments.length != 2) return done('attachment not added');
-                    if(doc.attachments[1].filename != 'kitten.jpg') return done('filename <> kitten.jpg');                
-                    if(!doc.attachments[1].metadata) return done('metadata not found');                
-                    if(doc.attachments[1].small.length <= 0) return done('small image not found');                
-                    if(doc.attachments[1].medium.length <=0) return done('medium image not found');                
+                    if(doc.attachments[1].filename != 'kitten.jpg') return done('filename <> kitten.jpg');
+                    if(!doc.attachments[1].metadata) return done('metadata not found');
+                    if(doc.attachments[1].small.length <= 0) return done('small image not found');
+                    if(doc.attachments[1].medium.length <=0) return done('medium image not found');
+                    if(doc.attachments[1].thumbnail.length <=0) return done('thumbnail image not found');
                     done();
                 })
                 .catch(function(err) {
@@ -200,11 +208,12 @@ describe('mongoose-gm plugin', function() {
             kitten.updateImage('kitten.jpg', bufferAnotherKitten)
             .then(function(doc) {
                 if(doc.attachments.length != 2) return done('attachment not added');
-                if(doc.attachments[1].filename != 'kitten.jpg') return done('filename <> kitten.jpg');       
-                if(doc.attachments[1].buffer.length != bufferAnotherKitten.toString('base64').length) return done('content not saved');                
-                if(!doc.attachments[1].metadata) return done('metadata not found');                
-                if(doc.attachments[1].small.length <= 0) return done('small image not found');                
-                if(doc.attachments[1].medium.length <=0) return done('medium image not found');                
+                if(doc.attachments[1].filename != 'kitten.jpg') return done('filename <> kitten.jpg');
+                if(doc.attachments[1].buffer.length != bufferAnotherKitten.toString('base64').length) return done('content not saved');
+                if(!doc.attachments[1].metadata) return done('metadata not found');
+                if(doc.attachments[1].small.length <= 0) return done('small image not found');
+                if(doc.attachments[1].medium.length <=0) return done('medium image not found');
+                if(doc.attachments[1].thumbnail.length <=0) return done('thumbnail image not found');
                 if(doc.attachments[1].metadata.Filesize == original_metadata.Filesize) return done('metadata not changed.');
                 done();
             })
@@ -279,12 +288,14 @@ describe('mongoose-gm plugin', function() {
                 if(doc.attachments[0].filename != 'kitten.jpg') {return done('filename incorrect');}
                 if(doc.attachments[0].small.length <= 0) {return done('small image not loaded');}
                 if(doc.attachments[0].medium.length <= 0) {return done('medium image not loaded');}
+                if(doc.attachments[1].thumbnail.length <=0) return done('thumbnail image not loaded');
                 if(doc.attachments[0].buffer.length > 0) {return done('buffer size > 0');}
                 if(!doc.attachments[0].hasOwnProperty('isKittenLicense')) {return done('property isKittenLicense not loaded');}
 
                 if(doc.attachments[1].filename != 'another-kitten.jpg') {return done('filename incorrect');}
                 if(doc.attachments[1].small.length <= 0) {return done('small image not loaded');}
                 if(doc.attachments[1].medium.length <= 0) {return done('medium image not loaded');}
+                if(doc.attachments[1].thumbnail.length <=0) return done('thumbnail image not loaded');
                 if(doc.attachments[1].buffer.length > 0) {return done('buffer size > 0');}
                 if(!doc.attachments[1].hasOwnProperty('isKittenLicense')) {return done('property isKittenLicense not loaded');}
                 
@@ -349,6 +360,7 @@ describe('mongoose-gm plugin', function() {
                 if(doc.attachments[1].filename != 'another-kitten.jpg') {return done('filename incorrect');}
                 if(doc.attachments[1].small.length <= 0) {return done('small image not loaded');}
                 if(doc.attachments[1].medium.length <= 0) {return done('medium image not loaded');}
+                if(doc.attachments[1].thumbnail.length <=0) {return done('thumbnail image not loaded');}
                 if(doc.attachments[1].buffer.length > 0) {return done('buffer size > 0');}
                 if(!doc.attachments[1].hasOwnProperty('isKittenLicense')) {return done('property isKittenLicense not loaded');}
                 
@@ -413,6 +425,7 @@ describe('mongoose-gm plugin', function() {
                 if(doc.attachments[1].filename != 'another-kitten.jpg') {return done('filename incorrect');}
                 if(doc.attachments[1].small.length <= 0) {return done('small image not loaded');}
                 if(doc.attachments[1].medium.length <= 0) {return done('medium image not loaded');}
+                if(doc.attachments[1].thumbnail.length <=0) {return done('thumbnail image not loaded');}
                 if(doc.attachments[1].buffer.length <= 0) {return done('buffer size <= 0');}
                 if(!doc.attachments[1].hasOwnProperty('isKittenLicense')) {return done('property isKittenLicense not loaded');}
                 
