@@ -57,7 +57,7 @@ var options = {
         medium: { //adds 'medium' property to the attachment containing resized 1600 width image.
             width: 1600 //resize with aspect ratio of original image
         },
-       thumbnail: { //adds 'thumbnail' property to the attachment containing 256x356 image
+       thumbnail: { //adds 'thumbnail' property to the attachment containing 256x256 image
  +          width: 256,
  +          height: 256,
  +          thumbnail: true //resize with gravity center
