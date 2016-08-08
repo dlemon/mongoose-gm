@@ -1,4 +1,7 @@
-![alt tag](https://travis-ci.org/dlemon/mongoose-gridstore.svg?branch=master) [![NPM version][npm-version-image]][npm-url]  [![MIT License][license-image]][license-url] [![NPM downloads][npm-downloads-image]][npm-url]
+![alt tag](https://travis-ci.org/dlemon/mongoose-gridstore.svg?branch=master) [![NPM version][npm-version-image]][npm-url]  [![MIT License][license-image]][license-url] [![NPM downloads][npm-downloads-image]][npm-url] <a href="https://scan.coverity.com/projects/dlemon-mongoose-gm">
+  <img alt="Coverity Scan Build Status"
+       src="https://img.shields.io/coverity/scan/9789.svg"/>
+</a>
 
 # mongoose-gm
 Promise based mongoose plugin for storing/manipulating base64 images in gridstore.
