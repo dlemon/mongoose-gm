@@ -1,4 +1,7 @@
-![alt tag](https://travis-ci.org/dlemon/mongoose-gridstore.svg?branch=master) [![NPM version][npm-version-image]][npm-url]  [![MIT License][license-image]][license-url] [![NPM downloads][npm-downloads-image]][npm-url]
+![alt tag](https://travis-ci.org/dlemon/mongoose-gridstore.svg?branch=master) [![NPM version][npm-version-image]][npm-url]  [![MIT License][license-image]][license-url] [![NPM downloads][npm-downloads-image]][npm-url] <a href="https://scan.coverity.com/projects/dlemon-mongoose-gm">
+  <img alt="Coverity Scan Build Status"
+       src="https://img.shields.io/coverity/scan/9789.svg"/>
+</a>
 
 # mongoose-gm
 Promise based mongoose plugin for storing/manipulating base64 images in gridstore.
@@ -53,7 +56,13 @@ var options = {
         },            
         medium: { //adds 'medium' property to the attachment containing resized 1600 width image.
             width: 1600 //resize with aspect ratio of original image
-        }
+        },
+       thumbnail: { //adds 'thumbnail' property to the attachment containing 256x256 image
+ +          width: 256,
+ +          height: 256,
+ +          thumbnail: true //resize with gravity center
+        }	
+      }
     },
     keys : ['property1', 'property2'], //optional, additonal keys that you want to add to the attachment object
     mongoose: mongoose //optional, the mongoose instance your app is using. Defaults to latest version.
