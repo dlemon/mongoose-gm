@@ -56,7 +56,13 @@ var options = {
         },            
         medium: { //adds 'medium' property to the attachment containing resized 1600 width image.
             width: 1600 //resize with aspect ratio of original image
-        }
+        },
+       thumbnail: { //adds 'thumbnail' property to the attachment containing 256x356 image
+ +          width: 256,
+ +          height: 256,
+ +          thumbnail: true //resize with gravity center
+        }	
+      }
     },
     keys : ['property1', 'property2'], //optional, additonal keys that you want to add to the attachment object
     mongoose: mongoose //optional, the mongoose instance your app is using. Defaults to latest version.
