@@ -1,42 +1,42 @@
 {
-    "name": "mongoose-gm",
-    "version": "0.1.23",
-    "description": "Mongoose plugin for manipulating images in your document schema",
-	"author":"Dennis Lemon <dennis.lemon@sudselekt.com>",
-	"scripts": {
-		"test": "NODE_ENV=test mocha -R spec test/"
-	},
-    "keywords": [
-        "mongoose",
-        "mongoose-plugin",
-        "mongodb",
-		"gridstore",
-		"attachements",
-        "mongoose-gridstore",
-        "imagemagick",
-        "gm",        
-        "thumbnail"
-    ],
-    "main": "index.js",
-    "dependencies": {
-        "mongoose":"latest",
-        "mongoose-gridstore":"latest",
-        "rwlock":"latest",
-        "modelo":"latest",
-        "gm":"latest",
-        "q":"latest",
-        "node-uuid":"latest"
-    },
-    "devDependencies": {
-        "mocha": "latest",
-        "chai": "latest"
-    },
-	"repository": {
-		"type": "git",
-		"url": "git@github.com:dlemon/mongoose-gm.git"
-	},
-    "license": "MIT",
-	"engines": {
-		"node": ">=0.10"
-	}
+  "name": "mongoose-gm",
+  "version": "0.1.23",
+  "description": "Mongoose plugin for manipulating images in your document schema",
+  "author": "Dennis Lemon <dennis.lemon@sudselekt.com>",
+  "scripts": {
+    "test": "NODE_ENV=test mocha -R spec test/"
+  },
+  "keywords": [
+    "mongoose",
+    "mongoose-plugin",
+    "mongodb",
+    "gridstore",
+    "attachements",
+    "mongoose-gridstore",
+    "imagemagick",
+    "gm",
+    "thumbnail"
+  ],
+  "main": "index.js",
+  "dependencies": {
+    "gm": "latest",
+    "modelo": "latest",
+    "mongoose": "latest",
+    "mongoose-gridstore": "latest",
+    "q": "latest",
+    "rwlock": "latest",
+    "uuid": "^3.0.0"
+  },
+  "devDependencies": {
+    "mocha": "latest",
+    "chai": "latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:dlemon/mongoose-gm.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.10"
+  }
 }
